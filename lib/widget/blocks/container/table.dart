@@ -36,6 +36,14 @@ class TableConfig implements ContainerConfig {
     this.bodyPadding = const EdgeInsets.fromLTRB(8, 4, 8, 4),
   });
 
+  /// Default wrapper that provides horizontal scrolling for tables
+  static Widget defaultHorizontalScrollWrapper(Widget table) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: table,
+    );
+  }
+
   @nonVirtual
   @override
   String get tag => MarkdownTag.table.name;

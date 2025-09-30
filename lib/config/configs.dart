@@ -136,7 +136,7 @@ class MarkdownConfig {
       _getConfig<ListConfig>(MarkdownTag.li, const ListConfig());
 
   TableConfig get table =>
-      _getConfig<TableConfig>(MarkdownTag.table, const TableConfig());
+      _getConfig<TableConfig>(MarkdownTag.table, const TableConfig(wrapper: TableConfig.defaultHorizontalScrollWrapper));
 
   CodeConfig get code =>
       _getConfig<CodeConfig>(MarkdownTag.code, const CodeConfig());
