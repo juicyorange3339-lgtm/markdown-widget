@@ -108,27 +108,32 @@ class H1Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H1Config(
-      {this.style = const TextStyle(
-        fontSize: 32,
-        height: 40 / 32,
-        fontWeight: FontWeight.bold,
-      )});
+  final HeadingDivider? _divider;
+
+  const H1Config({
+    this.style = const TextStyle(
+      fontSize: 32,
+      height: 40 / 32,
+      fontWeight: FontWeight.bold,
+    ),
+    HeadingDivider? divider,
+  }) : _divider = divider;
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h1.name;
 
   static H1Config get darkConfig => const H1Config(
-          style: TextStyle(
-        fontSize: 32,
-        height: 40 / 32,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 32,
+      height: 40 / 32,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 
   @override
-  HeadingDivider? get divider => HeadingDivider.h1;
+  HeadingDivider? get divider => _divider ?? HeadingDivider.h1;
 }
 
 ///config class for h2
@@ -136,27 +141,32 @@ class H2Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H2Config(
-      {this.style = const TextStyle(
-        fontSize: 24,
-        height: 30 / 24,
-        fontWeight: FontWeight.bold,
-      )});
+  final HeadingDivider? _divider;
+
+  const H2Config({
+    this.style = const TextStyle(
+      fontSize: 24,
+      height: 30 / 24,
+      fontWeight: FontWeight.bold,
+    ),
+    HeadingDivider? divider,
+  }) : _divider = divider;
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h2.name;
 
   static H2Config get darkConfig => const H2Config(
-          style: TextStyle(
-        fontSize: 24,
-        height: 30 / 24,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 24,
+      height: 30 / 24,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 
   @override
-  HeadingDivider? get divider => HeadingDivider.h2;
+  HeadingDivider? get divider => _divider ?? HeadingDivider.h2;
 }
 
 ///config class for h3
@@ -164,27 +174,32 @@ class H3Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H3Config(
-      {this.style = const TextStyle(
-        fontSize: 20,
-        height: 25 / 20,
-        fontWeight: FontWeight.bold,
-      )});
+  final HeadingDivider? _divider;
+
+  const H3Config({
+    this.style = const TextStyle(
+      fontSize: 20,
+      height: 25 / 20,
+      fontWeight: FontWeight.bold,
+    ),
+    HeadingDivider? divider,
+  }) : _divider = divider;
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h3.name;
 
   static H3Config get darkConfig => const H3Config(
-          style: TextStyle(
-        fontSize: 20,
-        height: 25 / 20,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 20,
+      height: 25 / 20,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 
   @override
-  HeadingDivider? get divider => HeadingDivider.h3;
+  HeadingDivider? get divider => _divider ?? HeadingDivider.h3;
 }
 
 ///config class for h4
@@ -192,24 +207,30 @@ class H4Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H4Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  @override
+  final HeadingDivider? divider;
+
+  const H4Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    this.divider,
+  });
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h4.name;
 
   static H4Config get darkConfig => const H4Config(
-          style: TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 }
 
 ///config class for h5
@@ -217,24 +238,30 @@ class H5Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H5Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  @override
+  final HeadingDivider? divider;
+
+  const H5Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    this.divider,
+  });
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h5.name;
 
   static H5Config get darkConfig => const H5Config(
-          style: TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 }
 
 ///config class for h6
@@ -242,22 +269,28 @@ class H6Config extends HeadingConfig {
   @override
   final TextStyle style;
 
-  const H6Config(
-      {this.style = const TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        fontWeight: FontWeight.bold,
-      )});
+  @override
+  final HeadingDivider? divider;
+
+  const H6Config({
+    this.style = const TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      fontWeight: FontWeight.bold,
+    ),
+    this.divider,
+  });
 
   @nonVirtual
   @override
   String get tag => MarkdownTag.h6.name;
 
   static H6Config get darkConfig => const H6Config(
-          style: TextStyle(
-        fontSize: 16,
-        height: 20 / 16,
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ));
+    style: TextStyle(
+      fontSize: 16,
+      height: 20 / 16,
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  );
 }
