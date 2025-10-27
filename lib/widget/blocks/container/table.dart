@@ -73,7 +73,7 @@ class TableNode extends ElementNode {
 
     final tableWidget = Table(
       columnWidths: tbConfig.columnWidths,
-      defaultColumnWidth: tbConfig.defaultColumnWidth ?? IntrinsicColumnWidth(),
+      defaultColumnWidth: tbConfig.defaultColumnWidth ?? const FlexColumnWidth(),
       textBaseline: tbConfig.textBaseline,
       textDirection: tbConfig.textDirection,
       border: tbConfig.border ??
