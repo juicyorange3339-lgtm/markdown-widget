@@ -1,19 +1,19 @@
 /// Utility helpers to temporarily replace Unicode bidirectional control
-/// characters with ASCII placeholders so that the markdown parser does not
-/// strip them out. After parsing, we can restore the original characters
-/// before rendering.
+/// characters with HTML numeric entities so that the markdown parser does not
+/// strip them out. After parsing, we decode the entities back to their
+/// original characters before rendering.
 const Map<String, String> _bidiPlaceholders = {
-  '\u200E': '__MW_BIDI_200E__', // Left-to-Right Mark
-  '\u200F': '__MW_BIDI_200F__', // Right-to-Left Mark
-  '\u202A': '__MW_BIDI_202A__', // Left-to-Right Embedding
-  '\u202B': '__MW_BIDI_202B__', // Right-to-Left Embedding
-  '\u202C': '__MW_BIDI_202C__', // Pop Directional Formatting
-  '\u202D': '__MW_BIDI_202D__', // Left-to-Right Override
-  '\u202E': '__MW_BIDI_202E__', // Right-to-Left Override
-  '\u2066': '__MW_BIDI_2066__', // Left-to-Right Isolate
-  '\u2067': '__MW_BIDI_2067__', // Right-to-Left Isolate
-  '\u2068': '__MW_BIDI_2068__', // First Strong Isolate
-  '\u2069': '__MW_BIDI_2069__', // Pop Directional Isolate
+  '\u200E': '&#x200E;', // Left-to-Right Mark
+  '\u200F': '&#x200F;', // Right-to-Left Mark
+  '\u202A': '&#x202A;', // Left-to-Right Embedding
+  '\u202B': '&#x202B;', // Right-to-Left Embedding
+  '\u202C': '&#x202C;', // Pop Directional Formatting
+  '\u202D': '&#x202D;', // Left-to-Right Override
+  '\u202E': '&#x202E;', // Right-to-Left Override
+  '\u2066': '&#x2066;', // Left-to-Right Isolate
+  '\u2067': '&#x2067;', // Right-to-Left Isolate
+  '\u2068': '&#x2068;', // First Strong Isolate
+  '\u2069': '&#x2069;', // Pop Directional Isolate
 };
 
 /// Replaces every supported bidi control character in [input] with a unique
