@@ -3,6 +3,7 @@ import 'package:markdown/markdown.dart' as m;
 
 import '../utils/bidi_sanitizer.dart';
 import '../utils/bidi_direction.dart';
+import '../utils/bidi_span_isolation.dart';
 import '../widget/blocks/leaf/heading.dart';
 import '../widget/span_node.dart';
 import '../widget/widget_visitor.dart';
@@ -83,9 +84,11 @@ class MarkdownGenerator {
     onTocList?.call(tocList);
     final List<Widget> widgets = [];
     for (var span in spans) {
-      final textSpan = spanNodeBuilder?.call(span) ?? span.build();
-      final richText = richTextBuilder?.call(textSpan) ??
-          Text.rich(textSpan, textDirection: detectTextDirectionFromSpan(textSpan));
+      final textSpan = applyBidiIsolation(
+        spanNodeBuilder?.call(span) ?? span.build(),
+      );
+      final richText =
+          richTextBuilder?.call(textSpan) ?? Text.rich(textSpan);
       widgets.add(Padding(padding: linesMargin, child: richText));
     }
     return widgets;

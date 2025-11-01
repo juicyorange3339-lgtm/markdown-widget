@@ -16,7 +16,6 @@ class ProxyRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return richTextBuilder?.call(textSpan) ??
-        Text.rich(textSpan, textDirection: detectTextDirectionFromSpan(textSpan));
+    return richTextBuilder?.call(textSpan) ?? Text.rich(textSpan);
   }
 }
