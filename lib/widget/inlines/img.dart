@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
+import '../../utils/bidi_sanitizer.dart';
+
 ///Tag: [MarkdownTag.img]
 class ImageNode extends SpanNode {
   final Map<String, String> attributes;
@@ -20,52 +22,75 @@ class ImageNode extends SpanNode {
     if (attributes['height'] != null) {
       height = double.parse(attributes['height']!);
     }
-    final imageUrl = attributes['src'] ?? '';
-    final alt = attributes['alt'] ?? '';
+    final resolvedAttributes = {
+      for (final entry in attributes.entries)
+        entry.key: restoreBidiCharacters(entry.value),
+    };
+    final imageUrl = resolvedAttributes['src'] ?? '';
+    final alt = resolvedAttributes['alt'] ?? '';
     final isNetImage = imageUrl.startsWith('http');
     final imgWidget = isNetImage
-        ? Image.network(imageUrl,
+        ? Image.network(
+            imageUrl,
             width: width,
             height: height,
-            fit: BoxFit.cover, errorBuilder: (ctx, error, stacktrace) {
-            return buildErrorImage(imageUrl, alt, error);
-          })
-        : Image.asset(imageUrl, width: width, height: height, fit: BoxFit.cover,
+            fit: BoxFit.cover,
             errorBuilder: (ctx, error, stacktrace) {
-            return buildErrorImage(imageUrl, alt, error);
-          });
+              return buildErrorImage(imageUrl, alt, error);
+            },
+          )
+        : Image.asset(
+            imageUrl,
+            width: width,
+            height: height,
+            fit: BoxFit.cover,
+            errorBuilder: (ctx, error, stacktrace) {
+              return buildErrorImage(imageUrl, alt, error);
+            },
+          );
     final result = (parent != null && parent is LinkNode)
         ? imgWidget
-        : Builder(builder: (context) {
-            return InkWell(
-              child: Hero(child: imgWidget, tag: imgWidget.hashCode),
-              onTap: () => _showImage(context, imgWidget),
-            );
-          });
+        : Builder(
+            builder: (context) {
+              return InkWell(
+                child: Hero(child: imgWidget, tag: imgWidget.hashCode),
+                onTap: () => _showImage(context, imgWidget),
+              );
+            },
+          );
     return WidgetSpan(
-        child: imgConfig.builder?.call(imageUrl, attributes) ?? result);
+      child: imgConfig.builder?.call(imageUrl, resolvedAttributes) ?? result,
+    );
   }
 
   Widget buildErrorImage(String url, String alt, Object? error) {
     return ProxyRichText(
-      TextSpan(children: [
-        WidgetSpan(
-            child: Icon(Icons.broken_image,
-                color: Colors.redAccent,
-                size: (parentStyle?.fontSize ??
-                        config.p.textStyle.fontSize ??
-                        16) *
-                    (parentStyle?.height ?? config.p.textStyle.height ?? 1.2))),
-        TextSpan(text: alt, style: parentStyle ?? config.p.textStyle),
-      ]),
+      TextSpan(
+        children: [
+          WidgetSpan(
+            child: Icon(
+              Icons.broken_image,
+              color: Colors.redAccent,
+              size:
+                  (parentStyle?.fontSize ?? config.p.textStyle.fontSize ?? 16) *
+                  (parentStyle?.height ?? config.p.textStyle.height ?? 1.2),
+            ),
+          ),
+          TextSpan(text: alt, style: parentStyle ?? config.p.textStyle),
+        ],
+      ),
       richTextBuilder: visitor.richTextBuilder,
     );
   }
 
   ///show image in a new window
   void _showImage(BuildContext context, Widget child) {
-    Navigator.of(context).push(PageRouteBuilder(
-        opaque: false, pageBuilder: (_, __, ___) => ImageViewer(child: child)));
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (_, __, ___) => ImageViewer(child: child),
+      ),
+    );
   }
 }
 
@@ -100,7 +125,10 @@ class ImageViewer extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             InteractiveViewer(
-                child: Center(child: Hero(child: child, tag: child.hashCode))),
+              child: Center(
+                child: Hero(child: child, tag: child.hashCode),
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -108,19 +136,17 @@ class ImageViewer extends StatelessWidget {
                 child: IconButton(
                   onPressed: () => Navigator.of(context).pop(),
                   icon: Container(
-                    child: Icon(
-                      Icons.clear,
-                      color: Colors.grey,
-                    ),
+                    child: Icon(Icons.clear, color: Colors.grey),
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                        color: Colors.white.toOpacity(0.2),
-                        shape: BoxShape.circle),
+                      color: Colors.white.toOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -128,6 +154,6 @@ class ImageViewer extends StatelessWidget {
   }
 }
 
-typedef ImgBuilder = Widget Function(
-    String url, Map<String, String> attributes);
+typedef ImgBuilder =
+    Widget Function(String url, Map<String, String> attributes);
 typedef ErrorImgBuilder = Widget Function(String url, String alt, Object error);

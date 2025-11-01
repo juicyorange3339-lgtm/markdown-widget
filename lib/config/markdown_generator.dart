@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:markdown/markdown.dart' as m;
 
+import '../utils/bidi_sanitizer.dart';
 import '../widget/blocks/leaf/heading.dart';
 import '../widget/span_node.dart';
 import '../widget/widget_visitor.dart';
@@ -28,25 +29,29 @@ class MarkdownGenerator {
   /// ```dart
   /// (HeadingNode node) => {'h1', 'h2'}.contains(node.headingConfig.tag)
   /// ```
-  MarkdownGenerator(
-      {this.inlineSyntaxList = const [],
-      this.blockSyntaxList = const [],
-      this.linesMargin = const EdgeInsets.symmetric(vertical: 8),
-      this.generators = const [],
-      this.onNodeAccepted,
-      this.extensionSet,
-      this.textGenerator,
-      this.spanNodeBuilder,
-      this.richTextBuilder,
-      this.splitRegExp,
-      headingNodeFilter})
-      : headingNodeFilter = headingNodeFilter ?? allowAll;
+  MarkdownGenerator({
+    this.inlineSyntaxList = const [],
+    this.blockSyntaxList = const [],
+    this.linesMargin = const EdgeInsets.symmetric(vertical: 8),
+    this.generators = const [],
+    this.onNodeAccepted,
+    this.extensionSet,
+    this.textGenerator,
+    this.spanNodeBuilder,
+    this.richTextBuilder,
+    this.splitRegExp,
+    headingNodeFilter,
+  }) : headingNodeFilter = headingNodeFilter ?? allowAll;
 
   ///convert [data] to widgets
   ///[onTocList] can provider [Toc] list
-  List<Widget> buildWidgets(String data,
-      {ValueCallback<List<Toc>>? onTocList, MarkdownConfig? config}) {
+  List<Widget> buildWidgets(
+    String data, {
+    ValueCallback<List<Toc>>? onTocList,
+    MarkdownConfig? config,
+  }) {
     final mdConfig = config ?? MarkdownConfig.defaultConfig;
+    final preprocessedData = protectBidiCharacters(data);
     final m.Document document = m.Document(
       extensionSet: extensionSet ?? m.ExtensionSet.gitHubFlavored,
       encodeHtml: false,
@@ -54,23 +59,25 @@ class MarkdownGenerator {
       blockSyntaxes: blockSyntaxList,
     );
     final regExp = splitRegExp ?? WidgetVisitor.defaultSplitRegExp;
-    final List<String> lines = data.split(regExp);
+    final List<String> lines = preprocessedData.split(regExp);
     final List<m.Node> nodes = document.parseLines(lines);
     final List<Toc> tocList = [];
     final visitor = WidgetVisitor(
-        config: mdConfig,
-        generators: generators,
-        textGenerator: textGenerator,
-        richTextBuilder: richTextBuilder,
-        splitRegExp: regExp,
-        onNodeAccepted: (node, index) {
-          onNodeAccepted?.call(node, index);
-          if (node is HeadingNode && headingNodeFilter(node)) {
-            final listLength = tocList.length;
-            tocList.add(
-                Toc(node: node, widgetIndex: index, selfIndex: listLength));
-          }
-        });
+      config: mdConfig,
+      generators: generators,
+      textGenerator: textGenerator,
+      richTextBuilder: richTextBuilder,
+      splitRegExp: regExp,
+      onNodeAccepted: (node, index) {
+        onNodeAccepted?.call(node, index);
+        if (node is HeadingNode && headingNodeFilter(node)) {
+          final listLength = tocList.length;
+          tocList.add(
+            Toc(node: node, widgetIndex: index, selfIndex: listLength),
+          );
+        }
+      },
+    );
     final spans = visitor.visit(nodes);
     onTocList?.call(tocList);
     final List<Widget> widgets = [];

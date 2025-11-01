@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/configs.dart';
+import '../../../utils/bidi_sanitizer.dart';
 import '../../span_node.dart';
 
 ///Tag: [MarkdownTag.a]
@@ -19,18 +20,17 @@ class LinkNode extends ElementNode {
 
   @override
   InlineSpan build() {
-    final url = attributes['href'] ?? '';
-    return TextSpan(children: [
-      for (final child in children)
-        _toLinkInlineSpan(
-          child.build(),
-          () => _onLinkTap(linkConfig, url),
-        ),
-      if (children.isNotEmpty)
-        // FIXME: this is a workaround, maybe need fixed by flutter framework.
-        // add a space to avoid the space area of line end can be tapped.
-        TextSpan(text: ' '),
-    ]);
+    final url = restoreBidiCharacters(attributes['href'] ?? '');
+    return TextSpan(
+      children: [
+        for (final child in children)
+          _toLinkInlineSpan(child.build(), () => _onLinkTap(linkConfig, url)),
+        if (children.isNotEmpty)
+          // FIXME: this is a workaround, maybe need fixed by flutter framework.
+          // add a space to avoid the space area of line end can be tapped.
+          TextSpan(text: ' '),
+      ],
+    );
   }
 
   void _onLinkTap(LinkConfig linkConfig, String url) {
@@ -51,10 +51,13 @@ class LinkConfig implements LeafConfig {
   final TextStyle style;
   final ValueCallback<String>? onTap;
 
-  const LinkConfig(
-      {this.style = const TextStyle(
-          color: Color(0xff0969da), decoration: TextDecoration.underline),
-      this.onTap});
+  const LinkConfig({
+    this.style = const TextStyle(
+      color: Color(0xff0969da),
+      decoration: TextDecoration.underline,
+    ),
+    this.onTap,
+  });
 
   @nonVirtual
   @override
@@ -77,10 +80,7 @@ InlineSpan _toLinkInlineSpan(InlineSpan span, VoidCallback onTap) {
     );
   } else if (span is WidgetSpan) {
     span = WidgetSpan(
-      child: InkWell(
-        child: span.child,
-        onTap: onTap,
-      ),
+      child: InkWell(child: span.child, onTap: onTap),
       alignment: span.alignment,
       baseline: span.baseline,
       style: span.style,

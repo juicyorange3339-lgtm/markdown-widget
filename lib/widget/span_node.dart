@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/bidi_sanitizer.dart';
+
 ///the basic node
 abstract class SpanNode {
   InlineSpan build();
@@ -36,8 +38,11 @@ abstract class ElementNode extends SpanNode {
   InlineSpan build() => childrenSpan;
 
   TextSpan get childrenSpan => TextSpan(
-      children:
-          List.generate(children.length, (index) => children[index].build()));
+    children: List.generate(
+      children.length,
+      (index) => children[index].build(),
+    ),
+  );
 }
 
 ///the default concrete node for ElementNode
@@ -61,5 +66,8 @@ class TextNode extends SpanNode {
   }
 
   @override
-  InlineSpan build() => TextSpan(text: text, style: style?.merge(parentStyle));
+  InlineSpan build() => TextSpan(
+    text: restoreBidiCharacters(text),
+    style: style?.merge(parentStyle),
+  );
 }

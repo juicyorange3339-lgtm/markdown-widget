@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/configs.dart';
+import '../../utils/bidi_sanitizer.dart';
 import '../span_node.dart';
 
 ///Tag:  [MarkdownTag.code]
@@ -13,7 +14,8 @@ class CodeNode extends ElementNode {
   CodeNode(this.text, this.codeConfig);
 
   @override
-  InlineSpan build() => TextSpan(style: style, text: text);
+  InlineSpan build() =>
+      TextSpan(style: style, text: restoreBidiCharacters(text));
 
   @override
   TextStyle get style => codeConfig.style.merge(parentStyle);
@@ -23,8 +25,9 @@ class CodeNode extends ElementNode {
 class CodeConfig implements InlineConfig {
   final TextStyle style;
 
-  const CodeConfig(
-      {this.style = const TextStyle(backgroundColor: Color(0xCCeff1f3))});
+  const CodeConfig({
+    this.style = const TextStyle(backgroundColor: Color(0xCCeff1f3)),
+  });
 
   static CodeConfig get darkConfig =>
       CodeConfig(style: const TextStyle(backgroundColor: Color(0xCC555555)));

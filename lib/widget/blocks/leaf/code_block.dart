@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_highlight/themes/a11y-dark.dart';
 import 'package:flutter_highlight/themes/a11y-light.dart';
+import 'package:markdown/markdown.dart' as m;
 import 'package:highlight/highlight.dart' as hi;
 import 'package:markdown_widget/markdown_widget.dart';
-import 'package:markdown/markdown.dart' as m;
+
+import '../../../utils/bidi_sanitizer.dart';
 
 ///Tag: [MarkdownTag.pre]
 ///
@@ -13,7 +15,7 @@ import 'package:markdown/markdown.dart' as m;
 class CodeBlockNode extends ElementNode {
   CodeBlockNode(this.element, this.preConfig, this.visitor);
 
-  String get content => element.textContent;
+  String get content => restoreBidiCharacters(element.textContent);
   final PreConfig preConfig;
   final m.Element element;
   final WidgetVisitor visitor;
@@ -29,9 +31,9 @@ class CodeBlockNode extends ElementNode {
       language = null;
       debugPrint('get language error:$e');
     }
-    final splitContents = content
-        .trim()
-        .split(visitor.splitRegExp ?? WidgetVisitor.defaultSplitRegExp);
+    final splitContents = content.trim().split(
+      visitor.splitRegExp ?? WidgetVisitor.defaultSplitRegExp,
+    );
     if (splitContents.last.isEmpty) splitContents.removeLast();
     final codeBuilder = preConfig.builder;
     if (codeBuilder != null) {
@@ -65,8 +67,8 @@ class CodeBlockNode extends ElementNode {
       ),
     );
     return WidgetSpan(
-        child:
-            preConfig.wrapper?.call(widget, content, language ?? '') ?? widget);
+      child: preConfig.wrapper?.call(widget, content, language ?? '') ?? widget,
+    );
   }
 
   @override
@@ -84,14 +86,17 @@ List<InlineSpan> highLightSpans(
   int tabSize = 8,
 }) {
   return convertHiNodes(
-      hi.highlight
-          .parse(input.trimRight(),
-              language: autoDetectionLanguage ? null : language,
-              autoDetection: autoDetectionLanguage)
-          .nodes!,
-      theme,
-      textStyle,
-      styleNotMatched);
+    hi.highlight
+        .parse(
+          input.trimRight(),
+          language: autoDetectionLanguage ? null : language,
+          autoDetection: autoDetectionLanguage,
+        )
+        .nodes!,
+    theme,
+    textStyle,
+    styleNotMatched,
+  );
 }
 
 List<TextSpan> convertHiNodes(
@@ -108,9 +113,11 @@ List<TextSpan> convertHiNodes(
     final nodeStyle = parentStyle ?? theme[node.className ?? ''];
     final finallyStyle = (nodeStyle ?? styleNotMatched)?.merge(style);
     if (node.value != null) {
-      currentSpans.add(node.className == null
-          ? TextSpan(text: node.value, style: finallyStyle)
-          : TextSpan(text: node.value, style: finallyStyle));
+      currentSpans.add(
+        node.className == null
+            ? TextSpan(text: node.value, style: finallyStyle)
+            : TextSpan(text: node.value, style: finallyStyle),
+      );
     } else if (node.children != null) {
       List<TextSpan> tmp = [];
       currentSpans.add(TextSpan(children: tmp, style: finallyStyle));
@@ -164,12 +171,12 @@ class PreConfig implements LeafConfig {
   }) : assert(builder == null || wrapper == null);
 
   static PreConfig get darkConfig => const PreConfig(
-        decoration: BoxDecoration(
-          color: Color(0xff555555),
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-        ),
-        theme: a11yDarkTheme,
-      );
+    decoration: BoxDecoration(
+      color: Color(0xff555555),
+      borderRadius: BorderRadius.all(Radius.circular(8)),
+    ),
+    theme: a11yDarkTheme,
+  );
 
   ///copy by other params
   PreConfig copy({
@@ -199,10 +206,7 @@ class PreConfig implements LeafConfig {
   String get tag => MarkdownTag.pre.name;
 }
 
-typedef CodeWrapper = Widget Function(
-  Widget child,
-  String code,
-  String language,
-);
+typedef CodeWrapper =
+    Widget Function(Widget child, String code, String language);
 
 typedef CodeBuilder = Widget Function(String code, String language);
