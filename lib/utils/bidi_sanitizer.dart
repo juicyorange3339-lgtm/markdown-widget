@@ -36,3 +36,14 @@ String _swapCharacters(String input, {required bool forward}) {
   }
   return result;
 }
+
+/// Some text engines may not fully support isolate controls (U+2066..U+2069).
+/// To preserve intended directionality, map isolates to the older embedding
+/// controls that enjoy broader support: LRI->LRE, RLI->RLE, FSI->LRE, PDI->PDF.
+String normalizeBidiForRendering(String input) {
+  return input
+      .replaceAll('\u2066', '\u202A') // LRI -> LRE
+      .replaceAll('\u2067', '\u202B') // RLI -> RLE
+      .replaceAll('\u2068', '\u202A') // FSI -> LRE (best-effort)
+      .replaceAll('\u2069', '\u202C'); // PDI -> PDF
+}

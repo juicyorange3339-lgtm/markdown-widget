@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/markdown_generator.dart';
+import '../utils/bidi_direction.dart';
 
 ///use [ProxyRichText] to give `textScaleFactor` a default value
 class ProxyRichText extends StatelessWidget {
@@ -15,6 +16,7 @@ class ProxyRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return richTextBuilder?.call(textSpan) ?? Text.rich(textSpan);
+    return richTextBuilder?.call(textSpan) ??
+        Text.rich(textSpan, textDirection: detectTextDirectionFromSpan(textSpan));
   }
 }

@@ -67,7 +67,7 @@ class TextNode extends SpanNode {
 
   @override
   InlineSpan build() => TextSpan(
-    text: restoreBidiCharacters(text),
-    style: style?.merge(parentStyle),
-  );
+        text: normalizeBidiForRendering(restoreBidiCharacters(text)),
+        style: style?.merge(parentStyle),
+      );
 }

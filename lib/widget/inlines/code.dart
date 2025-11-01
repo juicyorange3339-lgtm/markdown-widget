@@ -14,8 +14,10 @@ class CodeNode extends ElementNode {
   CodeNode(this.text, this.codeConfig);
 
   @override
-  InlineSpan build() =>
-      TextSpan(style: style, text: restoreBidiCharacters(text));
+  InlineSpan build() => TextSpan(
+        style: style,
+        text: normalizeBidiForRendering(restoreBidiCharacters(text)),
+      );
 
   @override
   TextStyle get style => codeConfig.style.merge(parentStyle);

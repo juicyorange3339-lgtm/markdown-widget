@@ -113,11 +113,8 @@ List<TextSpan> convertHiNodes(
     final nodeStyle = parentStyle ?? theme[node.className ?? ''];
     final finallyStyle = (nodeStyle ?? styleNotMatched)?.merge(style);
     if (node.value != null) {
-      currentSpans.add(
-        node.className == null
-            ? TextSpan(text: node.value, style: finallyStyle)
-            : TextSpan(text: node.value, style: finallyStyle),
-      );
+      final v = normalizeBidiForRendering(restoreBidiCharacters(node.value!));
+      currentSpans.add(TextSpan(text: v, style: finallyStyle));
     } else if (node.children != null) {
       List<TextSpan> tmp = [];
       currentSpans.add(TextSpan(children: tmp, style: finallyStyle));
